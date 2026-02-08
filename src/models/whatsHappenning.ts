@@ -1,5 +1,6 @@
 
-export interface WhatsHappening{
-    label: string,
-    title: string
+export interface WhatsHappening {
+  title: string;
+  description: string;
+  category: string;
 }
