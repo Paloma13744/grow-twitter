@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import Feed from "../pages/Feed.tsx";
+import Feed from "../pages/HomePage.tsx";
 import Explore from "../pages/Explore.tsx";
 import Login from "../pages/Login.tsx";
 import Profile from "../pages/Profile.tsx";

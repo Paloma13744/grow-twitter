@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Feed from "./pages/Feed";
+import Feed from "./pages/HomePage";
 import Explore from "./pages/Explore";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
