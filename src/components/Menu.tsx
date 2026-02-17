@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Tweet = () => {
+const Menu = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const Tweet = () => {
   )
 }
 
-export default Tweet
+export default Menu

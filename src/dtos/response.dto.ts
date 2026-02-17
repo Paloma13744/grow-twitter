@@ -1,5 +1,7 @@
-export interface ResponseDto {
-  ok: boolean;
-  message?: string;
-  [key: string]: any; 
-}
+
+export interface ResponseDto<T = unknown> {
+    ok: boolean;
+    message?: string;
+    data?: T;
+    [key: string]: unknown;
+  }
