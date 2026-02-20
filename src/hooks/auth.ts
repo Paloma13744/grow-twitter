@@ -6,17 +6,35 @@ export function useAuth() {
   const dispatch: AppDispatch = useDispatch();
 
   const reduxToken = useSelector((state: RootState) => state.auth.token);
-  const username = useSelector((state: RootState) => state.auth.username);
+  const reduxUsername = useSelector((state: RootState) => state.auth.username);
+  const reduxName = useSelector((state: RootState) => state.auth.name);
+  const reduxEmail = useSelector((state: RootState) => state.auth.email);
+  const reduxImageUrl = useSelector((state: RootState) => state.auth.imageUrl);
+
   const localToken = localStorage.getItem("auth_token");
 
   const token = reduxToken || localToken;
   const isAuthenticated = !!token;
 
-  function login(token: string, username: string) {
+  function login(
+    token: string,
+    username: string,
+    name: string,
+    email: string,
+    imageUrl: string
+  ) {
     localStorage.setItem("auth_token", token);
     localStorage.setItem("username", username);
 
-    dispatch(setCredentials({ token, username }));
+    dispatch(
+      setCredentials({
+        token,
+        username,
+        name,
+        email,
+        imageUrl,
+      })
+    );
   }
 
   function logout() {
@@ -25,5 +43,14 @@ export function useAuth() {
     dispatch(clearAuth());
   }
 
-  return { token, username, isAuthenticated, login, logout };
+  return {
+    token,
+    username: reduxUsername,
+    name: reduxName,
+    email: reduxEmail,
+    imageUrl: reduxImageUrl,
+    isAuthenticated,
+    login,
+    logout,
+  };
 }

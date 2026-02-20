@@ -12,10 +12,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={isAuthenticated ? <Home/> : <Navigate to="/login" />} />
-        <Route path="/explore" element={isAuthenticated ? <Explore /> : <Navigate to="/login" />} />
-        <Route path="/profile/:username" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/feed" element={isAuthenticated ? <Home/> : <Navigate to="/" />} />
+        <Route path="/explore" element={isAuthenticated ? <Explore /> : <Navigate to="/" />} />
+        <Route path="/profile/:username" element={isAuthenticated ? <Profile /> : <Navigate to="/" />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

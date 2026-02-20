@@ -34,10 +34,21 @@ const Login = () => {
       return;
     }
 
-    const { authToken, username: returnedUsername } = res.data;
+    const { token, user } = res.data;
 
-    localStorage.setItem("auth_token", authToken);
-    dispatch(setCredentials({ token: authToken, username: returnedUsername }));
+    localStorage.setItem("auth_token", token);
+
+    //console.log(token)
+
+    dispatch(
+      setCredentials({
+        token,
+        username: user.username,
+        name: user.name,
+        email: user.email ?? "",
+        imageUrl: user.imageUrl ?? "",
+      })
+    );
 
     setLoading(false);
     navigate("/feed");
@@ -122,7 +133,7 @@ const Login = () => {
                 variant="h5"
                 fontWeight={600}
                 textAlign="center"
-                color= "var(--color-black)"
+                color="var(--color-black)"
                 gutterBottom
               >
                 Entrar no Growtwitter
@@ -139,7 +150,7 @@ const Login = () => {
                 }}
               >
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                  <Typography variant="body2" color= "var(--color-gray-light)">
+                  <Typography variant="body2" color="var(--color-gray-light)">
                     Username
                   </Typography>
 
@@ -154,7 +165,7 @@ const Login = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                  <Typography variant="body2" color= "var(--color-gray-light)">
+                  <Typography variant="body2" color="var(--color-gray-light)">
                     Password
                   </Typography>
 
@@ -182,7 +193,7 @@ const Login = () => {
                   sx={{
                     mt: 1,
                     textTransform: "none",
-                    bgcolor:"var(--color-blue-light)",
+                    bgcolor: "var(--color-blue-light)",
                     ":hover": { bgcolor: "#1A8CD8" },
                   }}
                   disabled={loading}

@@ -1,7 +1,14 @@
 export interface LoginSuccess {
+  success: boolean;
+  message: string;
+  token: string;
+  user: {
     id: string;
+    name: string;
     username: string;
-    authToken: string;
+    imageUrl?: string;
+    email?: string;
+  };
 }
 
 export interface LoginError {

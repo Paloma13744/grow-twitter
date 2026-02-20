@@ -1,8 +1,9 @@
-import React from 'react'
+import Menu from '../components/Menu'
 
 const Feed = () => {
   return (
-    <div>NomeDoArquivo</div>
+    <Menu></Menu>
+    
   )
 }
 

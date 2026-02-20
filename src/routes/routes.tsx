@@ -6,7 +6,7 @@ import Profile from "../pages/Profile.tsx";
 
 export const routes = createBrowserRouter([ 
   {
-    path: "/login",
+    path: "/",
     element: <Login />
   },
   {
@@ -20,5 +20,10 @@ export const routes = createBrowserRouter([
   {
     path: "/profile/:username", 
     element: <Profile />
-  }
+  },
+  {
+    path: "*",
+    element: <Login />
+  },
+
 ]);

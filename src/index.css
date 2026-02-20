@@ -15,9 +15,10 @@ body {
 }
 
 :root {
-  font-family: 'Karla', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family: 'Karla', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --color-black: #333333;
   --color-blue-light: #1D9BF0;
   --color-gray: #758D9D;
   --color-gray-light: #aaa9a9;
+  --background-color: #f5f5f5;
 }
