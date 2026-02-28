@@ -5,6 +5,6 @@ export interface Tweet {
     content: string;
     createdAt: string;
     user: User;
-    likes: number;
-    replies: Tweet[];
-}
+    likes: number;     
+    replies: Tweet[];  
+  }

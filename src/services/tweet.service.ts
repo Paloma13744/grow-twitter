@@ -3,17 +3,16 @@ import type { ResponseDto } from "../dtos/response.dto";
 import type { Tweet } from "../models/tweet";
 
 class TweetService {
-  // feed do usuário logado
+
   async getFeed(): Promise<ResponseDto<Tweet[]>> {
     try {
-      const result = await api.get<Tweet[]>("/feed");
+      const result = await api.get<Tweet[]>("/feed"); 
       return { ok: true, data: result.data };
     } catch (error: any) {
       return apiService.handleError(error);
     }
   }
 
-  // criar tweet
   async createTweet(content: string): Promise<ResponseDto<Tweet>> {
     try {
       const result = await api.post<Tweet>("/tweets", { content });
@@ -22,7 +21,7 @@ class TweetService {
       return apiService.handleError(error);
     }
   }
-  // buscar tweet por id
+
   async getTweetById(id: string): Promise<ResponseDto<Tweet>> {
     try {
       const result = await api.get<Tweet>("/tweets", {
@@ -34,7 +33,6 @@ class TweetService {
     }
   }
 
-  // atualizar tweet
   async updateTweet(id: string, content: string): Promise<ResponseDto<Tweet>> {
     try {
       const result = await api.put<Tweet>("/tweets", { content }, {
@@ -46,7 +44,7 @@ class TweetService {
     }
   }
 
-  // deletar tweet
+
   async deleteTweet(id: string): Promise<ResponseDto> {
     try {
       const result = await api.delete("/tweets", {
@@ -58,7 +56,6 @@ class TweetService {
     }
   }
 
-  // tweets de um usuário específico (perfil)
   async getTweetsByUser(userId: string): Promise<ResponseDto<Tweet[]>> {
     try {
       const result = await api.get<Tweet[]>(`/users/${userId}/tweets`);
@@ -68,7 +65,6 @@ class TweetService {
     }
   }
 
-  // responder um tweet
   async replyTweet(tweetId: string, content: string): Promise<ResponseDto> {
     try {
       const result = await api.post("/replies", {
@@ -81,7 +77,6 @@ class TweetService {
     }
   }
 
-  // curtir um tweet
   async likeTweet(tweetId: string): Promise<ResponseDto> {
     try {
       const result = await api.post("/likes", { tweetId });
@@ -91,7 +86,6 @@ class TweetService {
     }
   }
 
-  // descurtir tweet
   async unlikeTweet(tweetId: string): Promise<ResponseDto> {
     try {
       const result = await api.delete("/likes", {
@@ -102,7 +96,6 @@ class TweetService {
       return apiService.handleError(error);
     }
   }
-
 
 
 

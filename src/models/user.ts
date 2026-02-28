@@ -3,7 +3,7 @@ export interface User {
   id: string;
   name: string;
   username: string;
-  profileImageUrl?: string;
+  imageUrl?: string;      
   followers?: User[];
   following?: User[];
 }

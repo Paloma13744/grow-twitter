@@ -1,8 +1,14 @@
 import React from 'react'
+import Card from '../components/Card'
 
 const Explore = () => {
   return (
-    <div>NomeDoArquivo</div>
+    <>
+
+    <h2>Explorar</h2>
+
+    <Card></Card>
+    </>
   )
 }
 

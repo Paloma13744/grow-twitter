@@ -35,7 +35,6 @@ class UserService {
   }
 
 
-
   async listUsers(): Promise<ResponseDto<User[]>> {
     try {
       const result = await api.get<User[]>("/users");
@@ -45,7 +44,6 @@ class UserService {
     }
   }
 
-  // perfil de um usuário pelo id
   async getUserById(userId: string): Promise<ResponseDto<User>> {
     try {
       const result = await api.get<User>("/users", {
@@ -57,7 +55,6 @@ class UserService {
     }
   }
 
-  // seguir usuário
   async followUser(userId: string): Promise<ResponseDto> {
     try {
       const result = await api.post("/followers", { userId });
@@ -67,7 +64,7 @@ class UserService {
     }
   }
 
-  // deixar de seguir usuário
+
   async unfollowUser(userId: string): Promise<ResponseDto> {
     try {
       const result = await api.delete("/followers", {
@@ -79,7 +76,6 @@ class UserService {
     }
   }
 
-  // listar seguidores do usuário logado
   async listFollowers(): Promise<ResponseDto> {
     try {
       const result = await api.get("/followers");

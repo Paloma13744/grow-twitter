@@ -24,7 +24,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { clearAuth } from "../store/authSlice";
 import type { RootState } from "../store";
 
-const Menu: React.FC = () => {
+const Menu: React.FC<{ onOpenTweetModal: () => void }> = ({ onOpenTweetModal }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -46,8 +46,8 @@ const Menu: React.FC = () => {
     <Box
       component="nav"
       sx={{
-        width: 260,
-        height: "100vh",
+        width: 230,
+        height: "95%",
         px: 2,
         py: 2,
         display: "flex",
@@ -96,12 +96,12 @@ const Menu: React.FC = () => {
               <ListItemIcon sx={{ minWidth: 40 }}>
                 <TagOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary="Explorar" 
-              primaryTypographyProps={{
-                fontFamily: "var(--font-family)",
-                fontSize: "14px",
-              }}
-              
+              <ListItemText primary="Explorar"
+                primaryTypographyProps={{
+                  fontFamily: "var(--font-family)",
+                  fontSize: "14px",
+                }}
+
               />
             </ListItemButton>
 
@@ -121,11 +121,11 @@ const Menu: React.FC = () => {
               <ListItemIcon sx={{ minWidth: 40 }}>
                 <PersonOutlineOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary="Perfil" 
-               primaryTypographyProps={{
-                fontFamily: "var(--font-family)",
-                fontSize: "14px",
-              }}/>
+              <ListItemText primary="Perfil"
+                primaryTypographyProps={{
+                  fontFamily: "var(--font-family)",
+                  fontSize: "14px",
+                }} />
             </ListItemButton>
 
           </NavLink>
@@ -134,12 +134,13 @@ const Menu: React.FC = () => {
         <Button
           variant="contained"
           fullWidth
+          onClick={onOpenTweetModal}
           sx={{
             borderRadius: "999px",
             py: 1.2,
             textTransform: "none",
             fontWeight: 400,
-            bgcolor: "var( --color-blue-light)"
+            bgcolor: "var(--color-blue-light)",
           }}
         >
           Tweetar
