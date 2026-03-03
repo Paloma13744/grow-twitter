@@ -8,13 +8,30 @@ interface AuthState {
   imageUrl: string | null;
 }
 
-const initialState: AuthState = {
-  token: null,
-  username: null,
-  name: null,
-  email: null,
-  imageUrl: null,
-};
+const STORAGE_KEY = "growtweet_auth";
+
+function loadAuth(): AuthState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { token: null, username: null, name: null, email: null, imageUrl: null };
+    const parsed = JSON.parse(raw) as AuthState;
+    return {
+      token: parsed.token ?? null,
+      username: parsed.username ?? null,
+      name: parsed.name ?? null,
+      email: parsed.email ?? null,
+      imageUrl: parsed.imageUrl ?? null,
+    };
+  } catch {
+    return { token: null, username: null, name: null, email: null, imageUrl: null };
+  }
+}
+
+function saveAuth(state: AuthState) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+const initialState: AuthState = loadAuth();
 
 const authSlice = createSlice({
   name: "auth",
@@ -35,6 +52,8 @@ const authSlice = createSlice({
       state.name = action.payload.name;
       state.email = action.payload.email;
       state.imageUrl = action.payload.imageUrl;
+
+      saveAuth(state);
     },
     clearAuth: (state) => {
       state.token = null;
@@ -42,6 +61,8 @@ const authSlice = createSlice({
       state.name = null;
       state.email = null;
       state.imageUrl = null;
+
+      localStorage.removeItem(STORAGE_KEY);
     },
   },
 });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Menu from "../components/Menu";
 import TweetModal from "../components/TweetarModal";
 import Card from "../components/Card";
@@ -7,24 +7,21 @@ import TweetItem from "../components/TweetItem";
 import tweetService from "../services/tweet.service";
 import type { Tweet } from "../models/tweet";
 
-const HomePage = () => {
-  const [openModal, setOpenModal] = useState(false);
+type ModalState =
+  | { open: false }
+  | { open: true; mode: "tweet" }
+  | { open: true; mode: "reply"; replyToId: string };
+
+const HomePage: React.FC = () => {
+  const [modal, setModal] = useState<ModalState>({ open: false });
   const [feed, setFeed] = useState<Tweet[]>([]);
   const [loading, setLoading] = useState(true);
 
-
   const loadFeed = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-
       const res = await tweetService.getFeed();
-
-      if (res.ok && Array.isArray(res.data)) {
-        setFeed(res.data);
-      } else {
-        setFeed([]); 
-      }
-
+      setFeed(res.ok && Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Erro ao carregar feed:", err);
       setFeed([]);
@@ -33,18 +30,14 @@ const HomePage = () => {
     }
   }, []);
 
-  // ============================
-  // EXECUTA AO INICIAR A PÁGINA
-  // ============================
   useEffect(() => {
     loadFeed();
   }, [loadFeed]);
 
- 
-
-  const handleReply = async (id: string) => {
-    console.log("reply tweet", id);
-  };
+  const openTweetModal = () => setModal({ open: true, mode: "tweet" });
+  const openReplyModal = (tweetId: string) =>
+    setModal({ open: true, mode: "reply", replyToId: tweetId });
+  const closeModal = () => setModal({ open: false });
 
   const handleLike = async (id: string) => {
     await tweetService.likeTweet(id);
@@ -61,21 +54,38 @@ const HomePage = () => {
     loadFeed();
   };
 
-
   return (
     <div style={styles.layout}>
       <div style={styles.left}>
-        <Menu onOpenTweetModal={() => setOpenModal(true)} />
+        <Menu onOpenTweetModal={openTweetModal} />
       </div>
 
-      <TweetModal open={openModal} onClose={() => setOpenModal(false)} />
+      {modal.open && modal.mode === "tweet" && (
+        <TweetModal
+          key="tweet"
+          open={true}
+          mode="tweet"
+          onClose={closeModal}
+          onSuccess={loadFeed}
+        />
+      )}
+
+      {modal.open && modal.mode === "reply" && (
+        <TweetModal
+          key={`reply-${modal.replyToId}`}
+          open={true}
+          mode="reply"
+          replyToId={modal.replyToId}
+          onClose={closeModal}
+          onSuccess={loadFeed}
+        />
+      )}
 
       <div style={styles.center}>
         <h3>Página Inicial</h3>
-        <hr />
+        <hr style={{ borderColor: "var(--border)" }} />
 
         {loading && <p>Carregando tweets...</p>}
-
         {!loading && feed.length === 0 && <p>Nenhum tweet encontrado.</p>}
 
         {!loading &&
@@ -83,7 +93,7 @@ const HomePage = () => {
             <TweetItem
               key={tweet.id}
               tweet={tweet}
-              onReply={handleReply}
+              onReply={openReplyModal}
               onLike={handleLike}
               onUnlike={handleUnlike}
               onDelete={handleDelete}
@@ -100,8 +110,6 @@ const HomePage = () => {
 
 export default HomePage;
 
-
-
 const styles: Record<string, React.CSSProperties> = {
   layout: {
     display: "flex",
@@ -109,21 +117,17 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     marginTop: "20px",
   },
-
   left: {
     width: "25%",
     display: "flex",
     justifyContent: "flex-end",
     paddingRight: "20px",
   },
-
   center: {
     width: "45%",
-    borderLeft: "1px solid #eee",
-    borderRight: "1px solid #eee",
+    borderRight: "1px solid var(--border)",
     padding: "0 20px",
   },
-
   right: {
     width: "25%",
     paddingLeft: "20px",

@@ -21,4 +21,5 @@ body {
   --color-gray: #758D9D;
   --color-gray-light: #aaa9a9;
   --background-color: #f5f5f5;
+  --border:  rgb(221, 221, 221);
 }

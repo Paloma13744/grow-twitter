@@ -10,8 +10,12 @@ export const api = axios.create({
     "https://api-growtwitter-illk.onrender.com",
 });
 
+
+const STORAGE_KEY = "growtweet_auth";
+
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem("auth_token");
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const token = raw ? JSON.parse(raw)?.token : null;
 
   if (token) {
     config.headers = config.headers ?? {};
