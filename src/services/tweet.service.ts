@@ -30,7 +30,7 @@ class TweetService {
     }
   }
 
-  async deleteTweet(id: string): Promise<ResponseDto> {
+  async deleteTweet(id: string): Promise<ResponseDto<{ success: boolean; message: string }>> {
     try {
       const result = await api.delete(`/tweets/${id}`);
       return { ok: true, data: result.data };

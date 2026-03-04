@@ -47,15 +47,14 @@ const Menu: React.FC<{ onOpenTweetModal: () => void }> = ({ onOpenTweetModal }) 
       component="nav"
       sx={{
         width: 230,
-        height: "95%",
-        px: 2,
+        minHeight: "100vh", 
         py: 2,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         borderRight: 1,
         borderColor: "divider",
-        bgcolor: "var( --background-color)",
+        bgcolor: "var(--background-color)"
       }}
     >
       <Box>
@@ -136,11 +135,13 @@ const Menu: React.FC<{ onOpenTweetModal: () => void }> = ({ onOpenTweetModal }) 
           fullWidth
           onClick={onOpenTweetModal}
           sx={{
+            width: "90%",
             borderRadius: "999px",
             py: 1.2,
             textTransform: "none",
             fontWeight: 400,
             bgcolor: "var(--color-blue-light)",
+            marginRight: "5px"
           }}
         >
           Tweetar
@@ -184,6 +185,7 @@ const Menu: React.FC<{ onOpenTweetModal: () => void }> = ({ onOpenTweetModal }) 
           sx={{
             textTransform: "none",
             fontWeight: 600,
+            width: "90%"
           }}
         >
           Sair

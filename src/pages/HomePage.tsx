@@ -50,8 +50,26 @@ const HomePage: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    await tweetService.deleteTweet(id);
-    loadFeed();
+    const token = localStorage.getItem("auth_token");
+  
+    if (!token) {
+      alert("Você precisa estar logado para deletar um tweet.");
+      return;
+    }
+  
+    const res = await tweetService.deleteTweet(id);
+  
+    if (res.ok) {
+      setFeed((prev) => prev.filter((t) => t.id !== id));
+      return;
+    }
+  
+
+    alert(
+      "Não é possível deletar o twitter de outra pessoa, tente deletar somente o seu."
+    );
+  
+    console.error("Erro ao deletar:", res.message);
   };
 
   return (
