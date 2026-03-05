@@ -1,24 +1,20 @@
 import React from "react";
 
 const topicos = [
-  {
-    category: "Esportes · há 45 min",
-    title: "Assunto sobre esportes",
-  },
-  {
-    category: "Assunto do Momento no Brasil",
-    title: "Assunto sobre Música",
-  },
-  {
-    category: "Cinema · Assunto do Momento",
-    title: "Assunto sobre Filmes e Cinema",
-  },
+  { category: "Esportes · há 45 min", title: "Assunto sobre esportes" },
+  { category: "Assunto do Momento no Brasil", title: "Assunto do Momento" },
+  { category: "Música - Assunto do Momento", title: "Assunto sobre Música" },
+  { category: "Cinema · Assunto do Momento", title: "Assunto sobre Filmes e Cinema" },
 ];
 
-const Card = () => {
+type CardProps = {
+  showTitle?: boolean;
+};
+
+const Card: React.FC<CardProps> = ({ showTitle = true }) => {
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>O que está acontecendo?</h3>
+      {showTitle && <h3 style={styles.title}>O que está acontecendo?</h3>}
 
       {topicos.map((item, index) => (
         <div key={index} style={styles.item}>
@@ -35,6 +31,8 @@ const Card = () => {
     </div>
   );
 };
+
+export default Card;
 
 const styles = {
   container: {
@@ -77,4 +75,3 @@ const styles = {
   },
 };
 
-export default Card;

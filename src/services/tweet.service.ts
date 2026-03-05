@@ -12,18 +12,20 @@ class TweetService {
     }
   }
 
-  async createTweet(content: string): Promise<ResponseDto<Tweet>> {
+  async getTweetsByUser(userId: string): Promise<ResponseDto<Tweet[]>> {
     try {
-      const result = await api.post<Tweet>("/tweets", { content });
-      return { ok: true, data: result.data };
+      const result = await api.get<{ success: boolean; data: Tweet[] }>(
+        `/tweets?userId=${userId}`
+      );
+      return { ok: true, data: result.data.data };
     } catch (error: any) {
       return apiService.handleError(error);
     }
   }
 
-  async getTweetById(id: string): Promise<ResponseDto<any>> {
+  async createTweet(content: string): Promise<ResponseDto<Tweet>> {
     try {
-      const result = await api.get(`/tweets/${id}`);
+      const result = await api.post<Tweet>("/tweets", { content });
       return { ok: true, data: result.data };
     } catch (error: any) {
       return apiService.handleError(error);
@@ -65,6 +67,7 @@ class TweetService {
       return apiService.handleError(error);
     }
   }
+
   async getComments(tweetId: string): Promise<ResponseDto<any>> {
     try {
       const result = await api.get(`/tweets/${tweetId}/comments`);
@@ -74,7 +77,5 @@ class TweetService {
     }
   }
 }
-
-
 
 export default new TweetService();

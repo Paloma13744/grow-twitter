@@ -4,9 +4,12 @@ import type { LoginSuccess } from "../models/login.interface";
 import type { User } from "../models/user";
 
 class UserService {
-  async signup(
-    data: { name: string; username: string; password: string; imageUrl?: string }
-  ): Promise<ResponseDto> {
+  async signup(data: {
+    name: string;
+    username: string;
+    password: string;
+    imageUrl?: string;
+  }): Promise<ResponseDto> {
     try {
       const result = await api.post("/auth/register", data);
       return { ok: true, data: result.data };
@@ -15,71 +18,52 @@ class UserService {
     }
   }
 
-  async login(
-    username: string,
-    password: string
-  ): Promise<ResponseDto<LoginSuccess>> {
+  async login(username: string, password: string): Promise<ResponseDto<LoginSuccess>> {
     try {
-      const result = await api.post<LoginSuccess>("/auth/login", {
-        username,
-        password,
-      });
-
-      return {
-        ok: true,
-        data: result.data,
-      };
+      const result = await api.post<LoginSuccess>("/auth/login", { username, password });
+      return { ok: true, data: result.data };
     } catch (error: any) {
       return apiService.handleError<LoginSuccess>(error);
     }
   }
 
 
-  async listUsers(): Promise<ResponseDto<User[]>> {
+  async getProfileByUsername(username: string): Promise<ResponseDto<User>> {
     try {
-      const result = await api.get<User[]>("/users");
-      return { ok: true, data: result.data };
+      const result = await api.get(`/users/${username}`);
+      return { ok: true, data: result.data?.data ?? result.data };
     } catch (error: any) {
       return apiService.handleError(error);
     }
   }
 
-  async getUserById(userId: string): Promise<ResponseDto<User>> {
-    try {
-      const result = await api.get<User>("/users", {
-        params: { userId },
-      });
-      return { ok: true, data: result.data };
-    } catch (error: any) {
-      return apiService.handleError(error);
-    }
+
+  async getUserByUsername(username: string): Promise<ResponseDto<User>> {
+    return this.getProfileByUsername(username);
   }
 
   async followUser(userId: string): Promise<ResponseDto> {
     try {
-      const result = await api.post("/followers", { userId });
+      const result = await api.post(`/users/${userId}/follow`);
       return { ok: true, data: result.data };
     } catch (error: any) {
       return apiService.handleError(error);
     }
   }
-
 
   async unfollowUser(userId: string): Promise<ResponseDto> {
     try {
-      const result = await api.delete("/followers", {
-        data: { userId },
-      });
+      const result = await api.delete(`/users/${userId}/follow`);
       return { ok: true, data: result.data };
     } catch (error: any) {
       return apiService.handleError(error);
     }
   }
 
-  async listFollowers(): Promise<ResponseDto> {
+  async listUsers(): Promise<ResponseDto<User[]>> {
     try {
-      const result = await api.get("/followers");
-      return { ok: true, data: result.data };
+      const result = await api.get("/users");
+      return { ok: true, data: result.data?.data ?? result.data };
     } catch (error: any) {
       return apiService.handleError(error);
     }
