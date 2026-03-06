@@ -12,10 +12,21 @@ import tweetService from "../services/tweet.service";
 import type { User } from "../models/user";
 import type { Tweet } from "../models/tweet";
 
+import CachedIcon from "@mui/icons-material/Cached";
+
 type ModalState =
   | { open: false }
   | { open: true; mode: "tweet" }
   | { open: true; mode: "reply"; replyToId: string };
+
+type ExploreUser = {
+  id: string;
+  name: string;
+  username: string;
+  imageUrl?: string | null;
+  followersCount?: number;
+  isFollowing?: boolean;
+};
 
 function readAuthFromStorage(): { token: string | null; username: string | null } {
   try {
@@ -30,7 +41,7 @@ function readAuthFromStorage(): { token: string | null; username: string | null 
 
       return { token, username };
     }
-  } catch {}
+  } catch { }
 
   return {
     token: localStorage.getItem("auth_token"),
@@ -44,6 +55,7 @@ const Profile: React.FC = () => {
 
   const auth = useMemo(() => readAuthFromStorage(), []);
   const usernameToShow = usernameParam ?? auth.username;
+  const loggedUsername = auth.username;
 
   const [modal, setModal] = useState<ModalState>({ open: false });
   const [loading, setLoading] = useState(true);
@@ -54,10 +66,32 @@ const Profile: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
+  const [users, setUsers] = useState<ExploreUser[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [followLoadingId, setFollowLoadingId] = useState<string | null>(null);
+
   const isOwnProfile = useMemo(() => {
     if (!auth.username || !usernameToShow) return false;
     return auth.username === usernameToShow;
   }, [auth.username, usernameToShow]);
+
+  const goToProfile = (username: string) => {
+    navigate(`/profile/${username}`);
+  };
+
+  const loadUsers = useCallback(async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await userService.listUsers?.();
+      const list = res?.ok && Array.isArray(res.data) ? (res.data as ExploreUser[]) : [];
+      setUsers(list);
+    } catch (e) {
+      console.error("Erro ao carregar usuários:", e);
+      setUsers([]);
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, []);
 
   const loadProfile = useCallback(async () => {
     if (!usernameToShow) {
@@ -80,14 +114,11 @@ const Profile: React.FC = () => {
 
       setUser(profile);
 
-
       const tweetsRes = await tweetService.getTweetsByUser(profile.id);
       const list = tweetsRes.ok && Array.isArray(tweetsRes.data) ? tweetsRes.data : [];
       setTweets(list);
 
-      const loggedUsername = auth.username;
       const followers = (profile as any)?.followers as User[] | undefined;
-
       if (loggedUsername && Array.isArray(followers)) {
         setIsFollowing(followers.some((f) => f?.username === loggedUsername));
       } else {
@@ -101,11 +132,19 @@ const Profile: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [auth.username, navigate, usernameToShow]);
+  }, [loggedUsername, navigate, usernameToShow]);
 
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
+
+  useEffect(() => {
+    if (usernameToShow) loadProfile();
+  }, [usernameToShow]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const openTweetModal = () => setModal({ open: true, mode: "tweet" });
   const openReplyModal = (tweetId: string) =>
@@ -115,7 +154,7 @@ const Profile: React.FC = () => {
   const handleFollowToggle = async () => {
     if (!user) return;
 
-      if (isOwnProfile) {
+    if (isOwnProfile) {
       alert("Você não pode seguir a si mesmo.");
       return;
     }
@@ -139,6 +178,7 @@ const Profile: React.FC = () => {
       }
 
       await loadProfile();
+      await loadUsers();
     } finally {
       setFollowLoading(false);
     }
@@ -166,6 +206,41 @@ const Profile: React.FC = () => {
     console.error("Erro ao deletar:", res.message);
   };
 
+  const toggleFollowRight = async (u: ExploreUser) => {
+    if (loggedUsername && u.username === loggedUsername) {
+      alert("Você não pode seguir a si mesmo.");
+      return;
+    }
+
+    setFollowLoadingId(u.id);
+    try {
+      const currentlyFollowing = !!u.isFollowing;
+
+      const res = currentlyFollowing
+        ? await userService.unfollowUser(u.id)
+        : await userService.followUser(u.id);
+
+      if (!res.ok) {
+        alert(res.message ?? "Não foi possível atualizar follow.");
+        return;
+      }
+
+      setUsers((prev) =>
+        prev.map((item) =>
+          item.id === u.id
+            ? {
+              ...item,
+              isFollowing: !currentlyFollowing,
+              followersCount: (item.followersCount ?? 0) + (currentlyFollowing ? -1 : 1),
+            }
+            : item
+        )
+      );
+    } finally {
+      setFollowLoadingId(null);
+    }
+  };
+
   return (
     <div style={styles.layout}>
       <div style={styles.left}>
@@ -173,13 +248,7 @@ const Profile: React.FC = () => {
       </div>
 
       {modal.open && modal.mode === "tweet" && (
-        <TweetModal
-          key="tweet"
-          open={true}
-          mode="tweet"
-          onClose={closeModal}
-          onSuccess={loadProfile}
-        />
+        <TweetModal key="tweet" open={true} mode="tweet" onClose={closeModal} onSuccess={loadProfile} />
       )}
 
       {modal.open && modal.mode === "reply" && (
@@ -197,9 +266,7 @@ const Profile: React.FC = () => {
         <div style={styles.headerRow}>
           <div>
             <h3 style={{ margin: 0 }}>Perfil de @{usernameToShow ?? ""}</h3>
-            <p style={{ margin: "4px 0 0 0", color: "gray", fontSize: 12 }}>
-              {tweets.length} tweets
-            </p>
+            <p style={{ margin: "4px 0 0 0", color: "gray", fontSize: 12 }}>{tweets.length} tweets</p>
           </div>
 
           {!isOwnProfile && user && (
@@ -247,13 +314,78 @@ const Profile: React.FC = () => {
             />
           ))}
 
-        {!loading && user && tweets.length === 0 && (
-          <p style={{ color: "gray" }}>Nenhum tweet encontrado.</p>
-        )}
+        {!loading && user && tweets.length === 0 && <p style={{ color: "gray" }}>Nenhum tweet encontrado.</p>}
       </div>
 
       <div style={styles.right}>
         <Card />
+
+        <div style={styles.rightDivider} />
+
+        <div style={styles.whoToFollowBox}>
+          <div style={styles.whoToFollowHeader}>
+            <h4 style={{ margin: 0 }}>Quem seguir</h4>
+
+            <button
+              type="button"
+              style={styles.refreshBtn}
+              onClick={loadUsers}
+              disabled={loadingUsers}
+              aria-label="Atualizar"
+              title="Atualizar"
+            >
+              <CachedIcon fontSize="small" />
+            </button>
+          </div>
+
+          {loadingUsers && <p style={{ color: "gray" }}>Carregando usuários...</p>}
+          {!loadingUsers && users.length === 0 && <p style={{ color: "gray" }}>Nenhum usuário encontrado.</p>}
+
+          {!loadingUsers &&
+            users
+              .filter((u) => u.username !== loggedUsername)
+              .slice(0, 5)
+              .map((u) => (
+                <div key={u.id} style={styles.userRow}>
+                  <div
+                    style={styles.userLeftClickable}
+                    onClick={() => goToProfile(u.username)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") goToProfile(u.username);
+                    }}
+                    title={`Ver perfil de @${u.username}`}
+                  >
+                    <img
+                      src={u.imageUrl ?? "https://via.placeholder.com/40"}
+                      alt={u.username}
+                      style={styles.userAvatar}
+                    />
+                    <div>
+                      <div style={styles.userName}>{u.name}</div>
+                      <div style={styles.userHandle}>@{u.username}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    style={{
+                      ...styles.followBtnSmall,
+                      ...(u.isFollowing ? styles.unfollowBtnSmall : null),
+                      opacity: followLoadingId === u.id ? 0.7 : 1,
+                      cursor: followLoadingId === u.id ? "not-allowed" : "pointer",
+                    }}
+                    disabled={followLoadingId === u.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFollowRight(u);
+                    }}
+                  >
+                    {u.isFollowing ? "Unfollow" : "Follow"}
+                  </button>
+                </div>
+              ))}
+        </div>
       </div>
     </div>
   );
@@ -283,6 +415,7 @@ const styles: Record<string, React.CSSProperties> = {
     width: "25%",
     paddingLeft: "20px",
   },
+
   headerRow: {
     display: "flex",
     alignItems: "center",
@@ -290,6 +423,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: "12px",
     marginBottom: "8px",
   },
+
   followBtn: {
     padding: "8px 14px",
     borderRadius: "999px",
@@ -303,6 +437,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#fff",
     color: "#111",
   },
+
   profileCard: {
     border: "1px solid var(--border)",
     borderRadius: "5px",
@@ -324,5 +459,81 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1px solid #fff",
     objectFit: "cover",
     background: "#eee",
+  },
+
+  rightDivider: {
+    height: 1,
+    background: "var(--border)",
+    margin: "14px 0",
+  },
+  whoToFollowBox: {
+    padding: "6px 0",
+  },
+  whoToFollowHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  refreshBtn: {
+    border: "none",
+    background: "var(--background-color)",
+    padding: "6px 10px",
+    borderRadius: 8,
+    cursor: "pointer",
+    fontWeight: 600,
+  },
+
+  userRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    padding: "10px 0",
+    borderBottom: "1px solid rgba(0,0,0,0.06)",
+  },
+
+  userLeftClickable: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    minWidth: 0,
+    cursor: "pointer",
+    borderRadius: 8,
+    padding: "4px 6px",
+  },
+
+  userAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: "50%",
+    objectFit: "cover",
+    background: "#eee",
+  },
+  userName: {
+    fontWeight: 700,
+    fontSize: 13,
+    lineHeight: "16px",
+  },
+  userHandle: {
+    color: "gray",
+    fontSize: 12,
+    lineHeight: "14px",
+  },
+
+  followBtnSmall: {
+    padding: "6px 12px",
+    borderRadius: "999px",
+    border: "1px solid var(--border)",
+    fontWeight: 600,
+    background: "var(--color-blue-light)",
+    color: "#fff",
+    whiteSpace: "nowrap",
+    cursor: "pointer",
+    fontSize: 12,
+  },
+  unfollowBtnSmall: {
+    background: "#fff",
+    color: "#111",
   },
 };

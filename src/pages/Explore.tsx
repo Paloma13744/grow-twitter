@@ -34,27 +34,28 @@ const Explore: React.FC = () => {
         <h3>Explorar</h3>
         <hr style={{ borderColor: "var(--border)" }} />
 
-        <p style={styles.topicCategory}>Esportes - Há 45 min</p>
-        <h4 style={styles.topicTitle}>Assunto sobre esportes</h4>
+        <div style={{ marginTop: 10 }}>
+          <p style={styles.topicCategory}>Esportes · há 45 min</p>
+          <h4 style={styles.topicTitle}>Assunto sobre esportes</h4>
 
-        <p style={styles.topicCategory}>Assunto do Momento em Brasil</p>
-        <h4 style={styles.topicTitle}>Assunto do Momento</h4>
+          <p style={styles.topicCategory}>Assunto do Momento no Brasil</p>
+          <h4 style={styles.topicTitle}>Assunto do Momento</h4>
 
-        <p style={styles.topicCategory}>Música - Assunto do Momento</p>
-        <h4 style={styles.topicTitle}>Assunto sobre Música</h4>
+          <p style={styles.topicCategory}>Música · Assunto do Momento</p>
+          <h4 style={styles.topicTitle}>Assunto sobre Música</h4>
 
-        <p style={styles.topicCategory}>Cinema - Assunto do Momento</p>
-        <h4 style={styles.topicTitle}>Assunto sobre Filmes e Cinema</h4>
+          <p style={styles.topicCategory}>Cinema · Assunto do Momento</p>
+          <h4 style={styles.topicTitle}>Assunto sobre Filmes e Cinema</h4>
 
-        <p style={styles.topicCategory}>Entretenimento - Assunto do Momento</p>
-        <h4 style={styles.topicTitle}>Assunto sobre Entretenimento</h4>
+          <p style={styles.topicCategory}>Entretenimento · Assunto do Momento</p>
+          <h4 style={styles.topicTitle}>Assunto sobre Entretenimento</h4>
 
-        <p style={styles.topicCategory}>Assunto do Momento em Porto Alegre</p>
-        <h4 style={styles.topicTitle}>Assunto do Momento em Porto Alegre</h4>
+          <p style={styles.topicCategory}>Assunto do Momento em Porto Alegre</p>
+          <h4 style={styles.topicTitle}>Assunto do Momento em Porto Alegre</h4>
 
-        <p style={styles.topicCategory}>Daphne - Principal Assunto do Momento</p>
-        <h4 style={styles.topicTitle}>Assunto sobre a Daphne</h4>
-
+          <p style={styles.topicCategory}>Daphne · Principal Assunto do Momento</p>
+          <h4 style={styles.topicTitle}>Assunto sobre a Daphne</h4>
+        </div>
       </div>
 
       <div style={styles.right}>
@@ -88,14 +89,14 @@ const styles: Record<string, React.CSSProperties> = {
     width: "25%",
     paddingLeft: "20px",
   },
+
   topicCategory: {
-    margin: "0 0 2px 0",   
+    margin: "0 0 2px 0",
     fontSize: "12px",
     color: "gray",
   },
-
   topicTitle: {
-    margin: "0 0 14px 0",  
+    margin: "0 0 14px 0",
     fontSize: "14px",
     fontWeight: 700,
   },
