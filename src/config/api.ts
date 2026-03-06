@@ -1,17 +1,13 @@
-import axios, {
-  type InternalAxiosRequestConfig,
-  type AxiosError,
-} from "axios";
+import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
 import type { ResponseDto } from "../dtos/response.dto";
 
-export const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_BASE_URL ||
-    "https://api-growtwitter-illk.onrender.com",
-});
-
-
 const STORAGE_KEY = "growtweet_auth";
+
+const baseURL = import.meta.env.PROD
+  ? "/api/proxy"
+  : (import.meta.env.VITE_API_BASE_URL || "https://api-growtwitter-illk.onrender.com");
+
+export const api = axios.create({ baseURL });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -29,19 +25,14 @@ class ApiService {
   public handleError<T = unknown>(error: any): ResponseDto<T> {
     console.error("API error:", error);
 
-    const result: ResponseDto<T> = {
-      ok: false,
-      message: "Erro desconhecido",
-    };
+    const result: ResponseDto<T> = { ok: false, message: "Erro desconhecido" };
 
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<{ message?: string }>;
-
-      if (axiosError.response?.data?.message) {
-        result.message = axiosError.response.data.message ?? result.message;
-      } else if (axiosError.message) {
-        result.message = axiosError.message;
-      }
+      result.message =
+        axiosError.response?.data?.message ??
+        axiosError.message ??
+        result.message;
     } else if (error instanceof Error) {
       result.message = error.message;
     }
