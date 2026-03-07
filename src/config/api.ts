@@ -1,13 +1,11 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
 import type { ResponseDto } from "../dtos/response.dto";
 
+export const api = axios.create({
+  baseURL: "/api/proxy",
+});
+
 const STORAGE_KEY = "growtweet_auth";
-
-const baseURL = import.meta.env.PROD
-  ? "/api/proxy"
-  : (import.meta.env.VITE_API_BASE_URL || "https://api-growtwitter-illk.onrender.com");
-
-export const api = axios.create({ baseURL });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -30,9 +28,7 @@ class ApiService {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<{ message?: string }>;
       result.message =
-        axiosError.response?.data?.message ??
-        axiosError.message ??
-        result.message;
+        axiosError.response?.data?.message || axiosError.message || result.message;
     } else if (error instanceof Error) {
       result.message = error.message;
     }
