@@ -5,10 +5,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api/proxy": {
+      "/api": {
         target: "https://api-growtwitter-illk.onrender.com",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/proxy/, ""),
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },
