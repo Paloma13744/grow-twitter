@@ -1,10 +1,24 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { path } = req.query;
+const API_BASE_URL = "https://api-growtwitter-illk.onrender.com";
 
-  const pathArray = Array.isArray(path) ? path : [path];
-  const targetUrl = `https://api-growtwitter-illk.onrender.com/${pathArray.join("/")}`;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Extrai o path: do query (?path=auth/login) ou da URL (/api/proxy/auth/login)
+  let path = req.query.path;
+  if (path === undefined || path === "") {
+    const url = req.url || "";
+    const match = url.match(/\/api\/proxy\/(.+?)(?:\?|$)/);
+    path = match ? match[1] : "";
+  }
+  const pathSegments = Array.isArray(path) ? path : String(path).split("/").filter(Boolean);
+  const targetPath = pathSegments.join("/");
+  const targetUrl = `${API_BASE_URL}/${targetPath}`;
+
+  if (!targetPath) {
+    return res.status(400).json({
+      error: { code: "400", message: "Path is required" },
+    });
+  }
 
   try {
     const response = await fetch(targetUrl, {
