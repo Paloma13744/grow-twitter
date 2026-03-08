@@ -5,7 +5,7 @@ import axios, {
 import type { ResponseDto } from "../dtos/response.dto";
 
 export const api = axios.create({
-  baseURL: "https://api-growtwitter-illk.onrender.com",
+  baseURL: "/api/proxy",
 });
 
 const STORAGE_KEY = "growtweet_auth";
